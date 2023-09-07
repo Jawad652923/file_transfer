@@ -1,35 +1,40 @@
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import os
-from flask import Flask,render_template,request,send_file,redirect,url_for
 from werkzeug.utils import secure_filename
-app=Flask(__name__)
 
+app = Flask(__name__)
 
-upload_folder="upload/"
-if not os.path.exists(upload_folder):
-    os.mkdir(upload_folder)
+UPLOAD_FOLDER = 'upload'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-app.config['UPLOAD_FOLDER']= upload_folder
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
-
-
-@app.route("/index")
+@app.route('/index', methods=['GET','POST'])
 def index():
     return render_template('upload_file.html')
 
-@app.route('/upload', methods=['GET','POST'])
+@app.route('/upload', methods=['POST'])
 def upload_file():
-    if request.method=='POST':
-        file=request.files['file']   
-        file_name=request.args.get('file')    
-        print(file_name) 
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(file.filename)))
-        return render_template('download_link.html',name=file.filename)
-    # return redirect(url_for('index'))
+    if 'file' not in request.files:
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        return redirect(request.url)
 
+    if file:
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
 
+        file_url = request.host_url+url_for('download_file', filename=filename)
+        print(file_url)
+        return render_template('download_link.html', name=filename, file_url=file_url)
 
-# @app.route('/download/<filename>')
-# def download_link(filename):
+@app.route('/uploads/<filename>')
+def download_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
 
     
 
