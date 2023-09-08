@@ -16,8 +16,7 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files:
-        return redirect(request.url)
+
     file = request.files['file']
     if file.filename == '':
         return redirect(request.url)
@@ -27,12 +26,13 @@ def upload_file():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        file_url = request.host_url+url_for('download_file', filename=filename)
+        file_url = request.host_url + url_for('download_file',filename=filename)
         print(file_url)
         return render_template('download_link.html', name=filename, file_url=file_url)
 
-@app.route('/uploads/<filename>')
+@app.route('/upload/<filename>')
 def download_file(filename):
+    permitted_directory=
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
 
@@ -40,11 +40,6 @@ def download_file(filename):
 
 if __name__=='__main__':
     app.run(debug=True)
-
-
-
-
-
 
 
 
