@@ -10,36 +10,32 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-@app.route('/index', methods=['GET','POST'])
+@app.route('/', methods=['GET','POST'])
 def index():
     return render_template('upload_file.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-
     file = request.files['file']
     if file.filename == '':
         return redirect(request.url)
-
     if file:
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        file_url = request.host_url + url_for('download_file',filename=filename)
-        print(file_url)
-        return render_template('download_link.html', name=filename, file_url=file_url)
+        directory_url=f'{request.host_url}upload/{filename}'
+        print(directory_url)
+        return render_template('upload_file.html', name=filename, directory_url=directory_url)
+
+
 
 @app.route('/upload/<filename>')
-def download_file(filename):
-    permitted_directory=
+def file_directory(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
 
-    
-
 if __name__=='__main__':
     app.run(debug=True)
-
 
 

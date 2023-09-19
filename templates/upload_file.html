@@ -4,13 +4,14 @@
     <title>File Upload and Download</title>
 </head>
 <body>
+    {%if name!=null %}
+    <h3>File Uploaded Successfully!</h3>
+    <p>URL: <a href="{{ directory_url }}" target="_blank">{{ directory_url }}</a></p>
+    {%endif%}
     <form action="/upload" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" >
         <input type="submit" value="Upload">
     </form>
-    {% if download_link %}
-    <p><a href="{{ download_link }}">Download File</a></p>
-    {% endif %}
-    
+   
 </body>
 </html>
